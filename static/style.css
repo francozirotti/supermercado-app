@@ -172,7 +172,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .hint {
   color: var(--muted);
   font-size: 0.82rem;
-  margin-top: -4px;
+  margin-top: 10px;
+}
+
+/* Solo cuando el texto sigue justo a un título va pegado, para que no
+   quede un salto raro entre el título y su explicación. En cualquier otro
+   caso (después de una fila con botón, después de un botón grande, etc.)
+   .hint usa el margen normal de arriba para no montarse sobre nada. */
+h2 + .hint {
+  margin-top: 4px;
 }
 
 /* Botón de selección de foto: caja punteada, no bloque sólido */
@@ -222,12 +230,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .btn-reset:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* El .hint normalmente pega justo debajo de un título; aquí sigue a un
-   botón, así que necesita su propio espacio para no verse pegado. */
-.btn-reset + .hint {
-  margin-top: 12px;
 }
 
 .link-btn {
