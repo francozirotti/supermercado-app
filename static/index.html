@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gastos del Súper</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="topbar">
+  <h1>🛒 Gastos del Súper</h1>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="subir">Subir ticket</button>
+    <button class="tab-btn" data-tab="tickets">Tickets</button>
+    <button class="tab-btn" data-tab="resumen">Resumen</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- SUBIR TICKET -->
+  <section id="tab-subir" class="tab-panel active">
+    <div class="card">
+      <label class="field-label">¿De quién es este ticket?</label>
+      <div class="owner-row">
+        <select id="owner-select"></select>
+        <button id="btn-new-user" type="button" class="btn-secondary">+ Nueva persona</button>
+      </div>
+
+      <label class="field-label">Foto del ticket</label>
+      <input id="ticket-file" type="file" accept="image/*" capture="environment" />
+
+      <button id="btn-upload" class="btn-primary" disabled>Leer ticket</button>
+      <p id="upload-status" class="status-text"></p>
+    </div>
+
+    <div id="review-card" class="card hidden">
+      <h2>Revisa los ítems detectados</h2>
+      <p class="hint">Desmarca lo que NO va a la cuenta común (consumo personal). Puedes corregir nombre y precio.</p>
+      <table class="items-table">
+        <thead>
+          <tr><th></th><th>Producto</th><th>Precio (€)</th><th></th></tr>
+        </thead>
+        <tbody id="review-items-body"></tbody>
+      </table>
+      <button id="btn-add-item" class="btn-secondary" type="button">+ Añadir ítem manual</button>
+      <div class="totals-row">
+        <span>Total del ticket: <strong id="review-total-ticket">0.00€</strong></span>
+        <span>Va a la cuenta común: <strong id="review-total-incluido">0.00€</strong></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKETS -->
+  <section id="tab-tickets" class="tab-panel">
+    <div class="card">
+      <div class="row-between">
+        <h2>Tickets subidos</h2>
+        <button id="btn-refresh-tickets" class="btn-secondary" type="button">Actualizar</button>
+      </div>
+      <div id="tickets-list"></div>
+    </div>
+  </section>
+
+  <!-- RESUMEN -->
+  <section id="tab-resumen" class="tab-panel">
+    <div class="card">
+      <div class="row-between">
+        <h2>Resumen semanal</h2>
+        <button id="btn-refresh-summary" class="btn-primary" type="button">Actualizar resumen</button>
+      </div>
+      <div id="summary-content"></div>
+    </div>
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
