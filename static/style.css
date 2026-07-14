@@ -101,7 +101,7 @@ main {
   gap: 8px;
 }
 
-select, input[type="text"], input[type="number"] {
+select, input[type="text"], input[type="number"], input[type="date"] {
   padding: 10px 12px;
   border: 0.5px solid var(--border-strong);
   background: var(--card-bg);
@@ -115,6 +115,14 @@ select, input[type="text"], input[type="number"] {
 select:focus, input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+input[type="date"] {
+  color-scheme: light;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: opacity(0.45);
 }
 
 .hidden { display: none !important; }

@@ -279,7 +279,16 @@ function resetUploadForm() {
   uploadStatus.textContent = "";
   document.getElementById("review-card").classList.add("hidden");
   document.getElementById("review-items-body").innerHTML = "";
+  resetManualForm();
   updateUploadButtonState();
+}
+
+function resetManualForm() {
+  manualForm.classList.add("hidden");
+  document.getElementById("manual-desc").value = "";
+  document.getElementById("manual-amount").value = "";
+  manualDateInput.value = "";
+  document.getElementById("manual-status").textContent = "";
 }
 
 // ---------- Ticket sin respaldo (sin foto) ----------
@@ -322,10 +331,8 @@ document.getElementById("btn-manual-create").addEventListener("click", async () 
   manualStatus.textContent = "Creando…";
   try {
     await api("/api/tickets", { method: "POST", body: formData });
-    manualStatus.textContent = "✅ Ticket sin respaldo creado.";
-    document.getElementById("manual-desc").value = "";
-    document.getElementById("manual-amount").value = "";
-    manualDateInput.value = todayIso();
+    resetManualForm();
+    uploadStatus.textContent = "✅ Ticket sin respaldo creado.";
   } catch (err) {
     manualStatus.textContent = `❌ ${err.message}`;
   }

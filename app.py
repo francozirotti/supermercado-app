@@ -155,15 +155,20 @@ def list_tickets():
     period_id = request.args.get("period_id")
     conn = database.get_connection()
     try:
+        # Se ordena por la fecha de la factura (ticket_date) de más reciente a
+        # más antigua; los tickets sin fecha (p. ej. si la IA no la detectó)
+        # quedan al final, ordenados entre sí por fecha de creación.
+        order_clause = (
+            "ORDER BY (ticket_date IS NULL) ASC, ticket_date DESC, created_at DESC"
+        )
         if period_id:
             rows = conn.execute(
-                "SELECT * FROM tickets WHERE settlement_period_id = ? ORDER BY created_at DESC",
+                f"SELECT * FROM tickets WHERE settlement_period_id = ? {order_clause}",
                 (period_id,),
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT * FROM tickets WHERE settlement_period_id IS NULL "
-                "ORDER BY created_at DESC"
+                f"SELECT * FROM tickets WHERE settlement_period_id IS NULL {order_clause}"
             ).fetchall()
         return jsonify([_serialize_ticket(conn, r) for r in rows])
     finally:
