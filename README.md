@@ -58,3 +58,4 @@ supermercado-app/
 - Cada llamada a la API tiene un costo pequeño por imagen procesada (unos centavos de dólar). Revisa precios actualizados en https://docs.claude.com.
 - Los datos quedan en `gastos.db` (SQLite), un solo archivo. Para "resetear" el historial, basta con borrar ese archivo (se vuelve a crear vacío al arrancar).
 - No hay login/contraseñas — pensada para uso doméstico en red local. Si la despliegas en internet, considera agregar autenticación básica.
+
