@@ -285,15 +285,24 @@ function resetUploadForm() {
 // ---------- Ticket sin respaldo (sin foto) ----------
 
 const manualForm = document.getElementById("manual-ticket-form");
+const manualDateInput = document.getElementById("manual-date");
+
+function todayIso() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
 
 document.getElementById("btn-toggle-manual").addEventListener("click", () => {
   manualForm.classList.toggle("hidden");
+  if (!manualDateInput.value) manualDateInput.value = todayIso();
 });
 
 document.getElementById("btn-manual-create").addEventListener("click", async () => {
   const manualStatus = document.getElementById("manual-status");
   const ownerId = ownerSelect.value;
   const desc = document.getElementById("manual-desc").value.trim() || "Compra sin ticket";
+  const date = manualDateInput.value || todayIso();
   const amount = parseFloat(document.getElementById("manual-amount").value);
 
   if (!ownerId) {
@@ -307,6 +316,7 @@ document.getElementById("btn-manual-create").addEventListener("click", async () 
 
   const formData = new FormData();
   formData.append("owner_id", ownerId);
+  formData.append("ticket_date", date);
   formData.append("items", JSON.stringify([{ name: desc, price: amount, included: true }]));
 
   manualStatus.textContent = "Creando…";
@@ -315,6 +325,7 @@ document.getElementById("btn-manual-create").addEventListener("click", async () 
     manualStatus.textContent = "✅ Ticket sin respaldo creado.";
     document.getElementById("manual-desc").value = "";
     document.getElementById("manual-amount").value = "";
+    manualDateInput.value = todayIso();
   } catch (err) {
     manualStatus.textContent = `❌ ${err.message}`;
   }
