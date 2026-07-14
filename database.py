@@ -16,11 +16,25 @@ def get_connection():
 
 
 def init_db():
-    """Crea las tablas si no existen. Seguro de llamar en cada arranque."""
+    """Crea las tablas si no existen y aplica migraciones ligeras.
+    Seguro de llamar en cada arranque, incluso sobre una base ya en uso."""
     conn = get_connection()
     try:
         with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
             conn.executescript(f.read())
         conn.commit()
+        _run_migrations(conn)
     finally:
         conn.close()
+
+
+def _run_migrations(conn):
+    """Ajustes a bases de datos creadas con una versión anterior del esquema."""
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(tickets)").fetchall()}
+    if "settlement_period_id" not in columns:
+        conn.execute("ALTER TABLE tickets ADD COLUMN settlement_period_id INTEGER")
+        conn.commit()
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_tickets_period_id ON tickets(settlement_period_id)"
+    )
+    conn.commit()
