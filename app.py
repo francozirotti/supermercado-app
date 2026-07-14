@@ -33,6 +33,11 @@ ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "heic", "heif"}
 
 app = Flask(__name__, static_folder=str(STATIC_DIR), static_url_path="")
 
+# Se ejecuta siempre al importar este módulo (tanto con "python app.py" como
+# con Gunicorn/systemd en producción), no solo en modo desarrollo. Si no,
+# Gunicorn nunca crea las tablas nuevas ni corre las migraciones.
+database.init_db()
+
 
 def allowed_file(filename: str) -> bool:
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -404,6 +409,5 @@ def uploaded_file(filename):
 
 
 if __name__ == "__main__":
-    database.init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=True)

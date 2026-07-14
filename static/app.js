@@ -325,13 +325,17 @@ document.getElementById("btn-manual-create").addEventListener("click", async () 
 async function loadTickets() {
   const container = document.getElementById("tickets-list");
   container.innerHTML = "<p class='empty-state'>Cargando…</p>";
-  const tickets = await api("/api/tickets");
-  if (tickets.length === 0) {
-    container.innerHTML = "<p class='empty-state'>No hay tickets activos todavía.</p>";
-    return;
+  try {
+    const tickets = await api("/api/tickets");
+    if (tickets.length === 0) {
+      container.innerHTML = "<p class='empty-state'>No hay tickets activos todavía.</p>";
+      return;
+    }
+    container.innerHTML = "";
+    tickets.forEach((ticket) => container.appendChild(renderTicketBlock(ticket)));
+  } catch (err) {
+    container.innerHTML = `<p class="empty-state">❌ Error cargando tickets: ${err.message}</p>`;
   }
-  container.innerHTML = "";
-  tickets.forEach((ticket) => container.appendChild(renderTicketBlock(ticket)));
 }
 
 function renderTicketBlock(ticket) {
@@ -476,16 +480,21 @@ async function loadSummary() {
   container.innerHTML = "<p class='empty-state'>Calculando…</p>";
   document.getElementById("close-status").textContent = "";
 
-  const summary = await api("/api/summary");
+  try {
+    const summary = await api("/api/summary");
 
-  if (summary.balances.length === 0) {
-    container.innerHTML = "<p class='empty-state'>Agrega personas y tickets para ver el resumen.</p>";
+    if (summary.balances.length === 0) {
+      container.innerHTML = "<p class='empty-state'>Agrega personas y tickets para ver el resumen.</p>";
+      resetBtn.classList.add("hidden");
+      return;
+    }
+
+    container.innerHTML = renderSummaryHtml(summary);
+    resetBtn.classList.toggle("hidden", summary.total_shared <= 0);
+  } catch (err) {
+    container.innerHTML = `<p class="empty-state">❌ Error cargando el resumen: ${err.message}</p>`;
     resetBtn.classList.add("hidden");
-    return;
   }
-
-  container.innerHTML = renderSummaryHtml(summary);
-  resetBtn.classList.toggle("hidden", summary.total_shared <= 0);
 }
 
 document.getElementById("btn-refresh-summary").addEventListener("click", loadSummary);
@@ -512,13 +521,17 @@ document.getElementById("btn-close-settlement").addEventListener("click", async 
 async function loadHistory() {
   const container = document.getElementById("history-list");
   container.innerHTML = "<p class='empty-state'>Cargando…</p>";
-  const periods = await api("/api/settlement/history");
-  if (periods.length === 0) {
-    container.innerHTML = "<p class='empty-state'>Todavía no se ha cerrado ningún reparto.</p>";
-    return;
+  try {
+    const periods = await api("/api/settlement/history");
+    if (periods.length === 0) {
+      container.innerHTML = "<p class='empty-state'>Todavía no se ha cerrado ningún reparto.</p>";
+      return;
+    }
+    container.innerHTML = "";
+    periods.forEach((period) => container.appendChild(renderHistoryBlock(period)));
+  } catch (err) {
+    container.innerHTML = `<p class="empty-state">❌ Error cargando el histórico: ${err.message}</p>`;
   }
-  container.innerHTML = "";
-  periods.forEach((period) => container.appendChild(renderHistoryBlock(period)));
 }
 
 function renderHistoryBlock(period) {
