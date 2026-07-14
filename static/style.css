@@ -224,6 +224,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: not-allowed;
 }
 
+/* El .hint normalmente pega justo debajo de un título; aquí sigue a un
+   botón, así que necesita su propio espacio para no verse pegado. */
+.btn-reset + .hint {
+  margin-top: 12px;
+}
+
 .link-btn {
   background: none;
   border: none;
