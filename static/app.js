@@ -453,22 +453,24 @@ document.getElementById("btn-refresh-tickets").addEventListener("click", loadTic
 // ---------- Resumen ----------
 
 function renderSummaryHtml(summary) {
-  let html = `<p class="hint">Total gastado en la cuenta común: <strong>${euros(summary.total_shared)}</strong> · Parte justa por persona: <strong>${euros(summary.fair_share)}</strong></p>`;
+  let html = `<div class="summary-total-label">Total en cuenta común</div>`;
+  html += `<div class="summary-total-value">${euros(summary.total_shared)}</div>`;
+  html += `<div class="summary-total-sub">${euros(summary.fair_share)} por persona</div>`;
 
   html += `<table class="summary-table"><thead><tr><th>Persona</th><th>Pagó</th><th>Balance</th></tr></thead><tbody>`;
   summary.balances.forEach((b) => {
     const cls = b.balance > 0 ? "balance-positive" : b.balance < 0 ? "balance-negative" : "";
     const label = b.balance > 0 ? `le deben ${euros(b.balance)}` : b.balance < 0 ? `debe ${euros(Math.abs(b.balance))}` : "está a la par";
-    html += `<tr><td>${b.name}</td><td>${euros(b.paid)}</td><td class="${cls}">${label}</td></tr>`;
+    html += `<tr><td>${b.name}</td><td>pagó ${euros(b.paid)}</td><td class="${cls}">${label}</td></tr>`;
   });
   html += `</tbody></table>`;
 
-  html += `<h3 style="margin-top:18px;">Pagos para quedar parejos</h3>`;
+  html += `<div class="settlements-label">Pagos para quedar parejos</div>`;
   if (summary.settlements.length === 0) {
-    html += `<p class="empty-state">Nadie le debe nada a nadie. 🎉</p>`;
+    html += `<p class="empty-state">Nadie le debe nada a nadie.</p>`;
   } else {
     summary.settlements.forEach((s) => {
-      html += `<div class="settlement-item"><strong>${s.from}</strong> le paga <strong>${euros(s.amount)}</strong> a <strong>${s.to}</strong></div>`;
+      html += `<div class="settlement-item"><strong>${s.from}</strong> → <strong>${s.to}</strong> · ${euros(s.amount)}</div>`;
     });
   }
   return html;

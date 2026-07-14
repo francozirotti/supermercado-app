@@ -1,4 +1,4 @@
-# Gastos del Súper
+# Alacena
 
 App web para repartir los gastos del supermercado entre las 4 personas de la vivienda.
 
