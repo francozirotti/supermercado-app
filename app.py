@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 STATIC_DIR = BASE_DIR / "static"
-ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "heic", "heif"}
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "heic", "heif", "pdf"}
 
 app = Flask(__name__, static_folder=str(STATIC_DIR), static_url_path="")
 
@@ -104,11 +104,11 @@ def ocr_preview():
 
     file = request.files["image"]
     if file.filename == "" or not allowed_file(file.filename):
-        return jsonify({"error": "Formato de imagen no soportado"}), 400
+        return jsonify({"error": "Formato no soportado. Usa una foto (JPG/PNG) o un PDF."}), 400
 
-    image_bytes = file.read()
+    file_bytes = file.read()
     try:
-        extracted = ocr.extract_items_from_image(image_bytes)
+        extracted = ocr.extract_items_from_file(file_bytes, file.filename)
     except Exception as exc:  # noqa: BLE001 - se lo mostramos tal cual al usuario
         return jsonify({"error": f"No se pudo leer el ticket: {exc}"}), 502
 

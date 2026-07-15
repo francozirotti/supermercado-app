@@ -150,12 +150,24 @@ uploadBtn.addEventListener("click", async () => {
 function renderReview() {
   const card = document.getElementById("review-card");
   card.classList.remove("hidden");
+
+  const dateInput = document.getElementById("review-date");
+  const dateHint = document.getElementById("review-date-hint");
+  dateInput.value = state.review.date || "";
+  dateHint.classList.toggle("hidden", !!state.review.date);
+
   const tbody = document.getElementById("review-items-body");
   tbody.innerHTML = "";
   state.review.items.forEach((item) => tbody.appendChild(renderReviewRow(item)));
   recalcReviewTotals();
   document.getElementById("create-status").textContent = "";
 }
+
+document.getElementById("review-date").addEventListener("change", (e) => {
+  if (!state.review) return;
+  state.review.date = e.target.value || null;
+  document.getElementById("review-date-hint").classList.add("hidden");
+});
 
 function renderReviewRow(item) {
   const tr = document.createElement("tr");
@@ -279,6 +291,8 @@ function resetUploadForm() {
   uploadStatus.textContent = "";
   document.getElementById("review-card").classList.add("hidden");
   document.getElementById("review-items-body").innerHTML = "";
+  document.getElementById("review-date").value = "";
+  document.getElementById("review-date-hint").classList.add("hidden");
   resetManualForm();
   updateUploadButtonState();
 }

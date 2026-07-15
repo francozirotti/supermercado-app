@@ -28,12 +28,12 @@
         <button id="btn-new-user" type="button" class="btn-secondary">+ Nueva persona</button>
       </div>
 
-      <label class="field-label">Foto del ticket</label>
+      <label class="field-label">Foto o PDF del ticket</label>
       <label for="ticket-file" class="file-upload-btn">
-        <span class="file-upload-icon">📷</span>
-        <span>Elegir foto del ticket</span>
+        <span class="file-upload-icon">📎</span>
+        <span>Elegir foto o PDF del ticket</span>
       </label>
-      <input id="ticket-file" type="file" accept="image/*" capture="environment" class="hidden" />
+      <input id="ticket-file" type="file" accept="image/*,application/pdf" class="hidden" />
       <p id="file-name-display" class="status-text"></p>
 
       <button id="btn-upload" class="btn-primary" disabled>Leer ticket</button>
@@ -56,6 +56,11 @@
     <div id="review-card" class="card hidden">
       <h2>Revisa los ítems detectados</h2>
       <p class="hint">Desmarca lo que no va a la cuenta común (consumo personal). Puedes corregir nombre y precio. Nada queda guardado hasta que presiones "Crear ticket".</p>
+
+      <label class="field-label">Fecha del ticket</label>
+      <input id="review-date" type="date" />
+      <p id="review-date-hint" class="status-text hidden">No se pudo leer la fecha automáticamente — ponla a mano.</p>
+
       <table class="items-table">
         <thead>
           <tr><th></th><th>Producto</th><th>Precio (€)</th><th></th></tr>

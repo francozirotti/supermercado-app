@@ -1,4 +1,4 @@
-"""Lectura de tickets de supermercado usando la API de Claude (visión)."""
+"""Lectura de tickets de supermercado usando la API de Claude (visión + PDF)."""
 import base64
 import io
 import json
@@ -13,11 +13,13 @@ from PIL import Image
 MODEL = os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 
 MAX_DIMENSION = 1600  # px, para no mandar fotos gigantes a la API
+PDF_EXTENSIONS = {"pdf"}
 
 PROMPT = """Eres un sistema de lectura de tickets (facturas/boletas) de supermercado.
 
-Analiza la imagen adjunta y devuelve EXCLUSIVAMENTE un JSON válido, sin texto \
-antes ni después, sin bloques de código markdown, con esta forma exacta:
+Analiza el archivo adjunto (puede ser una foto o un PDF del ticket) y devuelve \
+EXCLUSIVAMENTE un JSON válido, sin texto antes ni después, sin bloques de código \
+markdown, con esta forma exacta:
 
 {
   "store": "nombre del supermercado si se ve, o null",
@@ -34,6 +36,7 @@ Reglas:
 - Si hay cantidad mayor a 1 (ej. "2 x Manzanas 1,50"), usa el precio TOTAL de esa línea (3,00), no el precio unitario, y refleja la cantidad en el nombre si es útil (ej. "Manzanas (x2)").
 - Si un precio no se lee con total claridad, igual inclúyelo con tu mejor estimación; no omitas productos.
 - No inventes productos que no estén impresos en el ticket.
+- Si no logras leer la fecha con certeza, devuelve "date": null en vez de adivinar.
 """
 
 
@@ -67,10 +70,34 @@ def _extract_json(text: str) -> dict:
     return json.loads(text[start : end + 1])
 
 
-def extract_items_from_image(image_bytes: bytes) -> dict:
-    """Envía la foto del ticket a Claude y devuelve {store, date, items:[{name, price}]}."""
-    processed_bytes, media_type = _preprocess_image(image_bytes)
+def _build_content_block(file_bytes: bytes, filename: str) -> dict:
+    ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+    if ext in PDF_EXTENSIONS:
+        b64_data = base64.standard_b64encode(file_bytes).decode("utf-8")
+        return {
+            "type": "document",
+            "source": {
+                "type": "base64",
+                "media_type": "application/pdf",
+                "data": b64_data,
+            },
+        }
+    processed_bytes, media_type = _preprocess_image(file_bytes)
     b64_data = base64.standard_b64encode(processed_bytes).decode("utf-8")
+    return {
+        "type": "image",
+        "source": {
+            "type": "base64",
+            "media_type": media_type,
+            "data": b64_data,
+        },
+    }
+
+
+def extract_items_from_file(file_bytes: bytes, filename: str) -> dict:
+    """Envía la foto o PDF del ticket a Claude y devuelve
+    {store, date, items:[{name, price}]}."""
+    content_block = _build_content_block(file_bytes, filename)
 
     client = _get_client()
     message = client.messages.create(
@@ -79,17 +106,7 @@ def extract_items_from_image(image_bytes: bytes) -> dict:
         messages=[
             {
                 "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": media_type,
-                            "data": b64_data,
-                        },
-                    },
-                    {"type": "text", "text": PROMPT},
-                ],
+                "content": [content_block, {"type": "text", "text": PROMPT}],
             }
         ],
     )
